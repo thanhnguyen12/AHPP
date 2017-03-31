@@ -1,1 +1,17 @@
 # Define what to be ignored by git control
+
+
+# R compilation output
+
+
+# Latex
+*.pdf
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+
