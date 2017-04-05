@@ -1,4 +1,4 @@
-A group project that is mainly developed in R and some in Python:
+A group project on house price prediction on Kaggle.
 
 More details
 
