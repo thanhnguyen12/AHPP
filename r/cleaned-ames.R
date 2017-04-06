@@ -35,8 +35,8 @@ sort(colSums(is.na(ames)), decreasing = T)
 # the following code replaces NA's that have known values from the data description
 
 repl.ls <- list(bsmtqual = "nobsmt", bsmtcond = "nobsmt", bsmtexposure = "nobsmt",
-                bsmtfinsf1 = "nobsmt", bsmtfinsf2 = "nobsmt", bsmtfintype1 = "nobsmt",
-                bsmtfintype2 = "nobsmt", fireplacequ = "nofire", alley = "noalley",
+                bsmtfintype1 = "nobsmt", bsmtfintype2 = "nobsmt", 
+                fireplacequ = "nofire", alley = "noalley",
                 garagetype = "nogar", garagefinish = "nogar",
                 garagequal = "nogar", garagecond = "nogar", poolqc = "nopool", 
                 fence = "nofence", miscfeature = "none")
@@ -86,9 +86,9 @@ boxplot(ames$garageyrblt, main = "garage year")
 
 
 # We  have a quantitative variable (year) but 81 houses do not have garages
-# What to do with NA's? I'm going to create a categorical variable "garageage" to capture
-# the age-related information while allowing us to account for no garage
-# I will bin the ages by quartile and replace NA's with 'nogar'
+# What to do with NA's? I'm going to turn garageyrblt into a categorical variable
+# to capture the age-related information while allowing us to account for no garage
+# I will just bin the ages by quartile and replace NA's with 'nogar'
 
 brkyr <- c(1899, 1961, 1980, 2002, 2011)
 yrlabel <- c("pre1961","pre1980","pre2002","pre2010")
@@ -119,7 +119,7 @@ ames$masvnrarea[is.na(ames$masvnrarea)] <- 0
 
 
 
-# finally we can remove the one observation where the eletric system is unknown
+# finally we can remove the one observation where the electric system is unknown
 
 ames <- ames %>% na.omit()
 
@@ -129,5 +129,4 @@ glimpse(ames)
 
 # The above code does it's best to retain as much information as possible from the original
 # dataset. Now we can focus on feature engineering, dimension reduction, or simply fitting models
-
-
+# We will probably need to wrap this code up in a function and apply it to the test dataframe
