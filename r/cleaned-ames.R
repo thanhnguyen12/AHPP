@@ -191,15 +191,11 @@ test$garageyrblt[is.na(test$garageyrblt)] <- "nogar"
 
 sort(colSums(is.na(test)), decreasing = T)
 
-### fit a model and submission 
-
-
-gbm.grid <- expand.grid(n.trees = seq(from = 200, to = 300, by = 50),
-                        shrinkage = seq(from = .01, to = .1, by = .02),
-                        n.minobsinnode = 10, interaction.depth =1:3)
+### fit a model and make submission 
 
 tc <- trainControl(method = "repeatedcv", number = 5, repeats = 2)
-gbm <- caret::train(saleprice ~ ., data=ames, method = "gbm", trControl = tc, tuneGrid = gbm.grid)
+
+gbm <- caret::train(saleprice ~ ., data=ames, method = "gbm", trControl = tc)
 
 
 
