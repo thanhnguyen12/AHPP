@@ -23,6 +23,7 @@ ames$saleprice <- log(ames$saleprice)
 glimpse(ames)
 dim(ames)
 
+
 sort(colSums(is.na(ames)), decreasing = T)
 
 
@@ -130,3 +131,79 @@ glimpse(ames)
 # The above code does it's best to retain as much information as possible from the original
 # dataset. Now we can focus on feature engineering, dimension reduction, or simply fitting models
 # We will probably need to wrap this code up in a function and apply it to the test dataframe
+
+
+#
+#
+# ------------------------------- test data -------------------------------------
+#
+#
+
+
+test <- read.csv("../data/test.csv", stringsAsFactors = F)
+
+test <- test %>% as_data_frame()
+names(test) <- tolower(names(test))
+sort(colSums(is.na(test)), decreasing = T)
+
+# replace known
+# some issues with this
+
+repl.ls <- list(bsmtqual = "nobsmt", bsmtcond = "nobsmt", bsmtexposure = "nobsmt",
+                bsmtfintype1 = "nobsmt", bsmtfintype2 = "nobsmt", 
+                fireplacequ = "nofire", alley = "noalley", saletype = "WD",
+                garagetype = "nogar", garagefinish = "nogar", bsmtunfsf = 0,
+                garagequal = "nogar", garagecond = "nogar", garagecars = 0,
+                garagearea = 0, poolqc = "nopool", fence = "nofence",
+                miscfeature = "none", mszoning = "RL", utilities = "AllPub",
+                bsmtfullbath = 0, bsmthalfbath = 0, functional = "Typ",
+                exterior1st = "VinylSd", exterior2nd = "VinylSd", bsmtfinsf1 = 0,
+                bsmtfinsf2 = 0, totalbsmtsf = 0, kitchenqual = "TA")
+
+
+# I filled in all the missing values with the modes read from the below barcharts
+
+barchart(test$saletype)
+barchart(test$mszoning)
+barchart(test$utilities)
+barchart(test$functional)
+barchart(test$exterior1st)
+barchart(test$exterior2nd)
+barchart(test$kitchenqual)
+
+test[ ,names(repl.ls)] <- test[ ,names(repl.ls)] %>% replace_na(repl.ls)
+
+
+test$lotfrontage[is.na(test$lotfrontage)] <- 0
+
+test$masvnrtype[is.na(test$masvnrtype)] <- "None"
+test$masvnrarea[is.na(test$masvnrarea)] <- 0
+
+# this takes care of an error where 2007 was entered as 2207
+
+brkyr <- c(1890, 1961, 1980, 2002, 2300)
+yrlabel <- c("pre1961","pre1980","pre2002","pre2010")
+
+
+test$garageyrblt <- as.character(cut(test$garageyrblt, breaks = brkyr, label = yrlabel))
+test$garageyrblt[is.na(test$garageyrblt)] <- "nogar"
+
+
+sort(colSums(is.na(test)), decreasing = T)
+
+### fit a model and submission 
+
+
+gbm.grid <- expand.grid(n.trees = seq(from = 200, to = 300, by = 50),
+                        shrinkage = seq(from = .01, to = .1, by = .02),
+                        n.minobsinnode = 10, interaction.depth =1:3)
+
+tc <- trainControl(method = "repeatedcv", number = 5, repeats = 2)
+gbm <- caret::train(saleprice ~ ., data=ames, method = "gbm", trControl = tc, tuneGrid = gbm.grid)
+
+
+
+
+submission <- data.frame(id =test$id, saleprice =exp(predict(gbm, newdata=test)))
+
+write.csv(submission, "01_submission.csv", row.names = F)
