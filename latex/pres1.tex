@@ -1,0 +1,73 @@
+\documentclass[xcolor=dvipsnames]{beamer}
+%[xcolor=dvipsnames]
+%\usetheme{default}
+%\usetheme{default}
+%\usetheme{Madrid}
+\usetheme{metropolis}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{epsfig}
+%\usepackage{pdfpages}
+\usepackage{amsmath,amssymb}
+\setbeamertemplate{navigation symbols}{}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\normal}{\mathcal{N}}
+\setbeamercovered{transparent}
+
+
+\title[Machine Learning]{Kaggle Project Update}
+\author[Stat 602]{}
+%\begin{enumerate}
+%\item Inference about the simple linear regression model
+%\item Inference about Prediction
+%\item Some Details of Regression Inference
+%\end{enumerate}
+\date{14 April, 2017}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}\frametitle{Initial Steps}
+
+\begin{enumerate}
+\item Fit simple models on unaltered data
+\item Removed \emph{NA} in data set where applicable
+\item Attempted PCA for dimension reduction
+\item Fit various models on ``clean" data with no new features
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}\frametitle{Model Results}
+
+\begin{center}
+\begin{tabular}{l c c}
+	\hline
+	Model & CV Error & Test Error \\
+	\hline
+	GBM & 0.1307 & 0.13066 \\
+	Lasso & & \\
+	PCA & & \\
+	Ensemble & 0.116 & 0.121 \\
+	\hline
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Next Steps}
+
+\begin{enumerate}
+\item Data dimension reduction (clustering?)
+\item Reduce variables for basement and garage
+\item Feature engineering
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
