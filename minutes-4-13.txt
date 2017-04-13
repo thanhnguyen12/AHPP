@@ -1,0 +1,6 @@
+mo/year - change to categorical variable group by seasons
+Neighborhoods - possibly group according to price
+MSsubclass - convert to factor
+nas - perhaps we want to keep nas, replace 'true' nas with 'unknown' to run models
+remove near zero var
+lotfrontage - replace with mean
