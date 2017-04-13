@@ -6,12 +6,30 @@ train_data <- read.csv('data/train_no_na.csv')
 test_data <- read.csv('data/test_no_na.csv')
 
 ## Data processing: produce dummy vars, remove zero-varance predictors
-numeric_var <- names(train)[which(sapply(train, is.numeric))]
+numeric_var <- names(train_data[, -c(1, 73)])[which(sapply(train_data[, -c(1, 73)], is.numeric))]
+
+# Skip id fields before doing transformation
+train_data[, numeric_var] <- exp(train_data[, numeric_var])
+
 
 # for training data
-dummy_vars <- dummyVars(saleprice ~., data = train_data[, -1])
-tmp <- as.data.frame(predict(dummy_vars, newdata = train_data[, -1]))
+dummy_vars <- dummyVars(saleprice ~., data = train_data)
+tmp <- as.data.frame(predict(dummy_vars, newdata = train_data))
 train_data <- data.frame(saleprice = train_data[, "saleprice"], tmp)
+
+# train_num_var <- train[, numeric_var]
+# num_col_means <- colMeans(train_num_var, na.rm = TRUE)
+# train_num_var[sapply(train_num_var, is.na)] <- 0
+
+
+near_zero_prds <- nearZeroVar(train_data)
+pruned_train <- train_data[, -near_zero_prds]
+pruned_train$saleprice <- log(pruned_train$saleprice)
+dim(pruned_train)
+
+train_idx <- createDataPartition(y = pruned_train$saleprice, p = 0.8, list = FALSE)
+train <- pruned_train[train_idx, ]
+validate_set <- pruned_train[-train_idx, ]
 
 # for test data
 dummy_vars <- dummyVars(id ~., data = test_data)
@@ -23,12 +41,6 @@ train_ctrl <- trainControl(method = 'repeatedcv',
                            number = 10,
                            repeats = 10)
 
-near_zero_prds <- nearZeroVar(train_data)
-pruned_train <- train_data[, -near_zero_prds]
-pruned_train$saleprice <- log(pruned_train$saleprice)
-dim(pruned_train)
-
-
 
 # Various fitting options
 pcr_fit <- train(saleprice ~., data = pruned_train,
@@ -37,22 +49,19 @@ pcr_fit <- train(saleprice ~., data = pruned_train,
                  tuneGrid = data.frame(.ncomp = seq(20, 50)),
                  trControl = train_ctrl)
 
-pls_fit <- train(saleprice ~., data = pruned_train,
+pls_fit <- train(saleprice ~., data = train,
                  method = 'pls', metric = 'RMSE',
                  preProcess = c("center", "scale"),
                  tuneLength = 10,
                  trControl = train_ctrl)
+
+testfit <- predict(pls_fit, newdata = validate_set)
 
 spls_fit <- train(saleprice ~., data = pruned_train,
                  method = 'spls', metric = 'RMSE',
                  preProcess = c("center", "scale"),
                  tuneLength = 50,
                  trControl = train_ctrl)
-
-train_num_var <- train[, numeric_var]
-num_col_means <- colMeans(train_num_var, na.rm = TRUE)
-train_num_var[sapply(train_num_var, is.na)] <- 0
-
 
 numeric_var <- names(test)[which(sapply(test, is.numeric))]
 test_num_var <- test[, numeric_var]
