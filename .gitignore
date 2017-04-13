@@ -2,7 +2,8 @@
 
 
 # R compilation output
-
+.RData
+.Rhistory
 
 # Latex
 *.pdf
