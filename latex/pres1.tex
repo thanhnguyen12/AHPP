@@ -7,7 +7,7 @@
 \usepackage{graphicx}
 \usepackage{graphics}
 \usepackage{epsfig}
-%\usepackage{pdfpages}
+\usepackage{pdfpages}
 \usepackage{amsmath,amssymb}
 \setbeamertemplate{navigation symbols}{}
 \newcommand{\specialcell}[2][c]{%
@@ -52,8 +52,9 @@
 	Model & CV Error & Test Error \\
 	\hline
 	GBM & 0.1307 & 0.13066 \\
-	Lasso & & \\
-	PCA & & \\
+	Ridge & 0.1437 & \\
+	PCR & 0.1412 & \\
+        PLS & 0.1255 & \\
 	Ensemble & 0.116 & 0.121 \\
 	\hline
 \end{tabular}
