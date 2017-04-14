@@ -36,9 +36,9 @@
 \begin{frame}\frametitle{Initial Steps}
 
 \begin{enumerate}
+\item Explored data
 \item Fit simple models on unaltered data
-\item Removed \emph{NA} in data set where applicable
-\item Attempted PCA for dimension reduction
+\item Removed \emph{NA} in data set where \emph{NA} had meaning as given in data document
 \item Fit various models on ``clean" data with no new features
 \end{enumerate}
 
@@ -54,7 +54,7 @@
 	GBM & 0.1307 & 0.13066 \\
 	Ridge & 0.1437 & \\
 	PCR & 0.1412 & \\
-        PLS & 0.1255 & \\
+	PLS & 0.1255 & \\
 	Ensemble & 0.116 & 0.121 \\
 	\hline
 \end{tabular}
@@ -64,9 +64,18 @@
 \begin{frame}\frametitle{Next Steps}
 
 \begin{enumerate}
-\item Data dimension reduction (clustering?)
-\item Reduce variables for basement and garage
+\item Data dimension reduction
+	\begin{itemize}
+	\item Tried PCA
+	\item Clustering for grouping high correlation predictors
+	\item Possibly remove variables with near zero variance
+	\end{itemize}
+\item Still unsure what to do with truly missing/unknown values
 \item Feature engineering
+	\begin{itemize}
+	\item Combine variables with basement and garage features
+	\item Neighborhoods
+	\end{itemize}
 \end{enumerate}
 
 \end{frame}
