@@ -279,24 +279,51 @@ write.csv(x = cleaned_test, file = "data/cleaned_test.csv", row.names = F)
 
 
 ############################# Prepare data for training deep net with Tensorflow #################
+n_train <- nrow(raw_train_data)
+
+# Create a dummy saleprice to create dummy variable for the whole data
+sale_price <- rep(0, nrow(cleaned_data))
+sale_price[1:n_train] <- raw_train_data$SalePrice
+
+# 
+dummy_data <- data.frame(cleaned_data, SalePrice = sale_price)
 
 # Create dummy variables
-dummy_vars <- dummyVars(SalePrice ~., data = combined_data)
+dummy_vars <- dummyVars(SalePrice ~., data = dummy_data)
+
+dummy_data_with_dum_vars <- as.data.frame(predict(dummy_vars, newdata = dummy_data))
+dim(dummy_data_with_dum_vars)
+
+# Again, remove any variable with near zero variance
+near_zero_features <- nearZeroVar(dummy_data_with_dum_vars)
+cleaned_dummy_data <- dummy_data_with_dum_vars[, -near_zero_features]
+dim(cleaned_dummy_data)
+
+
+cleaned_dummy_train <- cleaned_dummy_data[1:n_train, ]
+
+# Centering and scaling
+normal_model <- preProcess(cleaned_dummy_train, method = c("center", "scale"))
+
+norm_train <- predict(normal_model, cleaned_dummy_train)
+
+# 
+cleaned_dummy_test <- cleaned_dummy_data[1461 :nrow(cleaned_dummy_data), ]
+
+# Center and scaling test set with same information from training set
+norm_test <- predict(normal_model, cleaned_dummy_test)
+
+# Add output column
+norm_train$SalePrice <- log(raw_train_data$SalePrice+1)
 
 # Hold-out partition for training deep net
-hold_in <- createDataPartition(y = cleaned_train$SalePrice, p = 0.9, list = FALSE)
+hold_in <- createDataPartition(y = norm_train$SalePrice, p = 0.9, list = FALSE)
 
-ames_holdout <- cleaned_train[-hold_in, ]
-ames_train <- cleaned_train[hold_in, ]
+ames_holdout <- norm_train[-hold_in, ]
+ames_train <- norm_train[hold_in, ]
 
 write.csv(x = ames_train, file = "../../tensorflow/study/data/ames_train.csv", row.names = F)
 write.csv(x = ames_holdout, file = "../../tensorflow/study/data/ames_test.csv", row.names = F)
-write.csv(x = cleaned_test, file = "../../tensorflow/study/data/ames_prediction.csv", row.names = F)
+write.csv(x = norm_test, file = "../../tensorflow/study/data/ames_prediction.csv", row.names = F)
 
-# for training data
-dummy_vars <- dummyVars(saleprice ~., data = whole_data)
-tmp <- as.data.frame(predict(dummy_vars, newdata = whole_data))
-train <- tmp[1:n_train, ]
-test <- tmp[-train$id, ]
-train <- data.frame(saleprice = whole_data[1:n_train, "saleprice"], train)
-test <- data.frame(test)
+# Release memory
