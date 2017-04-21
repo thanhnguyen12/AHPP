@@ -270,6 +270,13 @@ dim(cleaned_data)
 # Write refined data to external directory
 cleaned_train <- cleaned_data[1:1460, ]
 cleaned_train$SalePrice <- raw_train_data$SalePrice
+
+# remove outliers
+outliers <- which(cleaned_train$GrLivArea > 4000)
+outliers
+
+# 4 outliers are removed from training set
+cleaned_train <- cleaned_train[!1:nrow(cleaned_train) %in% outliers, ]
 write.csv(x = cleaned_train, file = "data/cleaned_train.csv", row.names = F)
 
 # 
