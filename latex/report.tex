@@ -40,6 +40,12 @@ April 10 & Ensemble & 0.116 & 0.12168 & 673 \\
 \end{tabular}
 \end{center}
 
+\textbf{April 17th}
+
+This week we focused on data processing.  As a starting place, we read over the suggestions made by Tanner Carbonati on the forums.  From the thread, we learned about converting ordinal categories, such as the quality and condition variables, to numerical ordinal values, i.e. 1 - 5.  This seems to have value because it will help for models that depend on numerical inputs only while still maintaining the information in the original data set.  Additionally methods such as random forest can be improved by this categorization because then if the tree splits on these variables it is seeking the optimal cut-off point between low and high scores which intuitively seems desirable.  Also, some categories, such as Lot Contour, are skewed because most cases fall into the category of "Level", but then "Non-Level" is further divided into "Banked", "Hill", and "Low".  If we simplify the category to level/non-level then the groups are more even and we have more cases for the non-level category.  Since the data set is not very deep, having categories with too much granularity can reduce our prediction power by increasing the curse of dimensionality.  %We have learned that data processing is really where you spend the bulk of your time, because if you data is uninformed, so will your models be.  Garbage in, garbage out.
+
+We have tried to fit linear models and they individually have not been very successful.  Therefore, we suspect that the response is not linearly related with predictors.  So next we are planning to fit a non-linear model using neural networks.
+
 \textbf{April 10th}
 
 Our goal for this week was dimension reduction.  To accomplish this, we performed a PCA to see if we could identify any predictors with high eigenvalues or very low values.  However, most values were very high and fairly close to each other.  We suspect this is because of the high correlation among our variables.  A possible next step is to look into a cluster analysis of our predictors since clustering highly correlated variables could help us to reduce the number of predictors.  % Additionally, we know that methods such as random forest overly favor highly correlated variables and thus are prone to choosing variables that are not directly related to the response but rather correlated with another predictor that is.
