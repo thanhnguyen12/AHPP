@@ -284,13 +284,14 @@ cleaned_test <- cleaned_data[1461:nrow(cleaned_data), ]
 write.csv(x = cleaned_test, file = "data/cleaned_test.csv", row.names = F)
 
 
-
 ############################# Prepare data for training deep net with Tensorflow #################
-n_train <- nrow(raw_train_data)
+n_train <- nrow(raw_train_data) - length(outliers)
+
+cleaned_data <- cleaned_data[!1:nrow(cleaned_data) %in% outliers, ]
 
 # Create a dummy saleprice to create dummy variable for the whole data
 sale_price <- rep(0, nrow(cleaned_data))
-sale_price[1:n_train] <- raw_train_data$SalePrice
+sale_price[1:n_train] <- raw_train_data$SalePrice[-outliers]
 
 # 
 dummy_data <- data.frame(cleaned_data, SalePrice = sale_price)
@@ -315,13 +316,19 @@ normal_model <- preProcess(cleaned_dummy_train, method = c("center", "scale"))
 norm_train <- predict(normal_model, cleaned_dummy_train)
 
 # 
-cleaned_dummy_test <- cleaned_dummy_data[1461 :nrow(cleaned_dummy_data), ]
+cleaned_dummy_test <- cleaned_dummy_data[(n_train+1) :nrow(cleaned_dummy_data), ]
 
 # Center and scaling test set with same information from training set
 norm_test <- predict(normal_model, cleaned_dummy_test)
 
 # Add output column
-norm_train$SalePrice <- log(raw_train_data$SalePrice+1)
+stand_saleprice <- log(raw_train_data$SalePrice[-outliers] + 1);
+mean_sp <- mean(stand_saleprice)
+sd_sp <- sd(stand_saleprice)
+stand_saleprice <- (stand_saleprice - mean_sp)/sd_sp
+
+norm_train$SalePrice <- stand_saleprice
+norm_test$SalePrice <- sale_price[(n_train+1) :nrow(cleaned_dummy_data)]
 
 # Hold-out partition for training deep net
 hold_in <- createDataPartition(y = norm_train$SalePrice, p = 0.9, list = FALSE)
@@ -332,5 +339,5 @@ ames_train <- norm_train[hold_in, ]
 write.csv(x = ames_train, file = "../../tensorflow/study/data/ames_train.csv", row.names = F)
 write.csv(x = ames_holdout, file = "../../tensorflow/study/data/ames_test.csv", row.names = F)
 write.csv(x = norm_test, file = "../../tensorflow/study/data/ames_prediction.csv", row.names = F)
-
+write.csv(x = norm_train, file = "../../tensorflow/study/data/ames_all_train.csv", row.names = F)
 # Release memory
