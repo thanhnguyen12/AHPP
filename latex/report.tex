@@ -12,7 +12,7 @@ Team name: NotTooDeep\_Learning \\
 \today
 \vspace{0.5 cm}
 
-\textbf{Current placement}: 253
+\textbf{Current placement}: 152
 
 \textbf{Kaggle Placement}
 \begin{center}
@@ -20,7 +20,8 @@ Team name: NotTooDeep\_Learning \\
 \hline
 Week & Model & CV Error & Test Error & Placement \\
 \hline
-May 1 & Ensemble (PLS and xgboost) & - & 0.11756 & 253 \\
+May 1 & Ensemble of PLS, Xgboost, and Deep Net & - & 0.11574 & 152 \\
+April 31 & Ensemble (PLS and xgboost) & - & 0.11756 & 253 \\
 April 24 & Ensemble (PLS and Lasso) & - & 0.1198 & 478\\
 April 10 & Ensemble & 0.116 & 0.12168 & 673 \\
 April 3 & GBM & 0.1307 & 0.13066 & 1161 \\
@@ -38,6 +39,7 @@ April 3 & GBM & 0.1307 & 0.13066 & 1161 \\
 	Ensemble (simple average of PLS and Lasso) & - & .119 \\
 	PLS & 0.114 & 0.120 \\
 	Lasso & 0.112 & 0.120 \\
+	Deep Neural Net & 0.094 & 0.123 \\
 	Several models as features in GBM & 0.111 & 0.125 \\
 	\hline
 \end{tabular}
@@ -58,6 +60,10 @@ April 3 & GBM & 0.1307 & 0.13066 & 1161 \\
 %	\hline
 %\end{tabular}
 %\end{center}
+
+\textbf{May 1}
+
+This week looked into group lasso and ensembled our best models.  After ensembling our best individual models of PLS, xgboost, and deep net, we got a test error of 0.116.  Due to processing constraints we took a simple average of the models rather than seeking an optimal weighting scheme through CV.  Additionally our deep net was trained through tensorflow so we were not able to get a CV error for our full ensemble.
 
 \textbf{April 24th}
 
