@@ -9,7 +9,8 @@
 \graphicspath{{./plots/}}
 
 
-\newcommand{\thanh}[1]{{\color{blue} [Thanh: #1]}}
+%\newcommand{\thanh}[1]{{\color{blue} [Thanh: #1]}}
+\newcommand{\thanh}[1]{#1}
 
 \title{Kaggle Project Report \\ Team name: NotTooDeep\_Learning}
 \author{Ben Buzzee, Thanh Nguyen, Kellie McClernon}
@@ -17,27 +18,28 @@
 \begin{document}
 \maketitle
 
-
 \textbf{Final Scores}
 \begin{center}
 \begin{tabular}{l c c}
-	\hline
-	Model & Test Error (Public) & Full Test Error (Private) \\
-	\hline
-	Ensemble of PLS, Neural Net, and Xgboost & 0.115738 & 0.119502 \\
-	Ensemble of PLS and Xgboost & 0.117672 & 0.123988 \\
-	\hline
+\hline
+Model & Kaggle Score (Public) & Full Kaggle Score (Private) \\
+\hline
+Ensemble of PLS, Neural Net, and Xgboost & 0.115738 & 0.119502 \\
+GBM Ensemble of Elastic Net, PLS, GBM & 0.120134 & 0.121924 \\
+\hline
 \end{tabular}
 \end{center}
 
 \begin{center}
 \begin{tabular}{l c c}
-	\hline
-	Model & CV Error & Test Error\\
-	\hline
-	PLS & 0.114 & 0.1205 \\
-	Deep Neural Net & 0.094 & 0.1267 \\
-	\hline
+\hline
+Model & CV Error & Test Error\\
+\hline
+PLS & 0.114 & 0.1205 \\
+Xgboost & 0.111 \\
+Deep Neural Net & 0.094 & 0.1267 \\
+GBM Ensemble of Elastic Net, PLS, GBM & 0.112 & 0.120\\
+\hline
 \end{tabular}
 \end{center}
 
@@ -92,7 +94,7 @@ On a different data set that only fixed zeros from NA and changed ordinal catego
 
 Fitting a simple lasso on the new model matrix and removing variables with near-zero variance, we reduced the number of predictors by half with a CV error of 0.140.  Since this CV error was around where our models were before, the insight was mainly was in noticing which predictors the model used. Noticing that the model used sale month of May-July, this led to the creation of a summer sale month predictor which when the model was rerun further reduced the number of predictors.  The information that previously was being contained in 3 coefficients being reduced to 1.
 
-Since a lot of our predictors seem related such as the numerous variables on basement, building materials, quality ratings, etc. we thought group lasso probably helped if we had a clever way to group them. Currently there is no group lass method in caret, so for CV error, we used the cv function in the gglasso package.  Since it appeared the package does not center and scale within folds, we did this outside of function and got an overly optimistic CV error of 0.1000 \thanh{??? what was the Kaggle score for this predictor, why it is overly optimistic}. We tried making our own method in caret, but suspect something is not correct because then the error becomes 6.69.
+Since a lot of our predictors seem related such as the numerous variables on basement, building materials, quality ratings, etc. we thought group lasso probably helped if we had a clever way to group them. Currently there is no group lass method in caret, so for CV error, we used the cv function in the gglasso package.  Since it appeared the package does not center and scale within folds, we did this outside of function and got an overly optimistic CV error of 0.1000. We tried making our own method in caret, but suspect something is not correct because then the error becomes 6.69.
 
 Wanting to make use of PCA and check interactions, we made a model matrix of second order interactions. We had 5483 predictors initially. After fitting a lasso on a PCA within caret, we got a CV error of 0.120 and reduced our number of predictors to 173. Despite the good dimension reduction, these models did not offer improved CV errors.  Still we saw how some methods can direct new feature creation and how we potentionally incorporate interactions without an overwhelming number of dimensions in our feature matrix.
 
@@ -103,7 +105,7 @@ We found that on its own the PLS performed well with a CV error of 0.114 and red
 
 %We additionally fit a deep neural network regression with Tensorflow to see if it could reveal any compare to the mostly linear models we were fitting. We found that for the neural network, not only does it take a long time to train, but the network is easily influenced by starting values and stopping criteria because there are at lot of local minimums.  Also, like with random forests, we can not see how network is picking out predictors.  How does a computer or program decide what is important?  Thus we would get the best performance from a neural network with already well chosen features and reduced feature dimensionality, rather than throwing everything we could possible have into a neural network and hoping for the best.  We learned that some methods, such as PLS and lasso can help in the choice and creation of predictors, but other methods such as neural networks are most beneficial when predictors have already been optimally chosen.
 
-\thanh{We additionally fit a deep neural network regression with Tensorflow to see if it could reveal any non-linearity in the data. We tuned the network with bunch of options in the number hidden layers and the number of units per layer and the activation function. It tuned out we used 3 hidden layers of which each has 200 nodes and $\tanh$ activation functions for each hidden layer after a long time spent on tuning. We found that fitting a neural network is non-trivial, because it takes a long time to train, it is highly impacted by starting points and it easily suffers overfitting. The final fitted network has a CV error of 0.094 and Kaggle score of 0.1267. Initially, it seems that the deep network is highly overfitted; however it has pretty good public and private scores when combinined with PLS. We suspected that it could probably over-influenced by some outliers in the test set.} 
+\thanh{We additionally fit a deep neural network regression with Tensorflow to see if it could reveal any non-linearity in the data. We tuned the network with bunch of options in the number hidden layers and the number of units per layer and the activation function. It tuned out we used 3 hidden layers of which each has 200 nodes and $\tanh$ activation functions for each hidden layer after a long time spent on tuning. We found that fitting a neural network is non-trivial, because it takes a long time to train, it is highly impacted by starting points and it easily suffers overfitting. The final fitted network has a CV error of 0.094 which is the best CV we had and Kaggle score of 0.1267. Initially, it seems that the deep network is highly overfitted; however it has pretty good public and private scores when combinined with PLS. We suspected that it could probably be over-influenced by some outliers in the test set.} 
 
 We knew we wanted to assemble our best models but we struggled with how to do this optimally.  We attempted to use a caret ensemble package to find the CV error with our chosen models of xgboost and PLS but the processing was taking too much time because the program needed to refit the models for each repeat.  Since on its own, xgboost took a long time to train, repeating this multiple times was not feasible given the time span of the project.  Therefore, we chose to use simple averages of our models instead of attempting to find the optimal weights for each model.  In the end we added the predictions for the neural network with the PLS and xgboost which improved our test error.  We suspect that the neural network helped to reduce the influence of outliers and noise in our predictions.
 
