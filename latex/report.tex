@@ -1,5 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{amsmath, bm, graphicx}
+\newcommand{\myfont}{\fontfamily{pcr}\selectfont}
 \usepackage[margin=0.75in]{geometry}
 \usepackage[parfill]{parskip}
 \usepackage[none]{hyphenat}
@@ -11,7 +12,7 @@ Team name: NotTooDeep\_Learning \\
 \today
 \vspace{0.5 cm}
 
-\textbf{Current placement}: 673 (out of 2222)
+\textbf{Current placement}: 253
 
 \textbf{Kaggle Placement}
 \begin{center}
@@ -19,26 +20,62 @@ Team name: NotTooDeep\_Learning \\
 \hline
 Week & Model & CV Error & Test Error & Placement \\
 \hline
-April 3 & GBM & 0.1307 & 0.13066 & 1161 \\
+May 1 & Ensemble (PLS and xgboost) & - & 0.11756 & 253 \\
+April 24 & Ensemble (PLS and Lasso) & - & 0.1198 & 478\\
 April 10 & Ensemble & 0.116 & 0.12168 & 673 \\
+April 3 & GBM & 0.1307 & 0.13066 & 1161 \\
 \hline
 \end{tabular}
 \end{center}
 
+% After Data Cleaning
 \textbf{Best Fitted Models}
 \begin{center}
 \begin{tabular}{l c c}
 	\hline
 	Model & CV Error & Test Error \\
 	\hline
-	Ensemble & 0.116 & 0.12168 \\
-	PLS & 0.1255 & \\
-	GBM & 0.1307 & 0.13066 \\
-	PCR & 0.1412 & \\
-	Ridge & 0.1437 & \\
+	Ensemble (simple average of PLS and Lasso) & - & .119 \\
+	PLS & 0.114 & 0.120 \\
+	Lasso & 0.112 & 0.120 \\
+	Several models as features in GBM & 0.111 & 0.125 \\
 	\hline
 \end{tabular}
 \end{center}
+
+%Before Data cleaning
+%\textbf{Best Fitted Models}
+%\begin{center}
+%\begin{tabular}{l c c}
+%	\hline
+%	Model & CV Error & Test Error \\
+%	\hline
+%	Ensemble & 0.116 & 0.12168 \\
+%	PLS & 0.1255 & \\
+%	GBM & 0.1307 & 0.13066 \\
+%	PCR & 0.1412 & \\
+%	Ridge & 0.1437 & \\
+%	\hline
+%\end{tabular}
+%\end{center}
+
+\textbf{April 24th}
+
+We finished data clean up early this week, dealing with NAs and removing features.  We removed features that had little variation in the data, thus they did not add information about the sale price since they were the same for most of the houses.  We want features that will allow us to parse the cases into distinct groups, but not so many groups that we run into the curse of dimensionality and have sparsity.  With little or no variation in the predictor value for all cases, the predictor will be unlikely to contribute meaningfully to our final predictions.
+
+Once the data was cleaned, we fit the same models that preformed well before the data clean - such as GBM, PLS, and Lasso.  We noticed that just by handling the data processing well, we saW improvements in our CV errors by 0.01.  Our CV errors are slightly better than our Kaggle test erros.  Since we used {\myfont caret} to fit the model, we are not sure if this is because {\myfont caret} is training the model then on only 90\% of the data and not the entire data set, resulting in poorer predictions.  Additionally, our CV score could be too optimistic if part of our data clean process is actually leveraging the entire data before we do our CV splits.  We plan to next fit xgboost to see how that perfoms.
+
+We have been trying to fit a simple neural network.  However, even though the CV errors appear good, the test errors are quite high.  This suggests to us that the neural network is over-fitting on the training data and unable to be flexible enough to give good predictions on our hold-out test data.
+
+%PLS .114 0.120 - could provide good interpretable results
+%Lasso 0.112 0.120
+%Ensemble (simple average of PLS and Lasso) - .1189
+%Models as feature in GBM 0.111 0.125
+% data clean too good?  not fitting/training on entire data set, only 90% in CV?
+
+%xgboost
+
+%Simple deep net, working on avoiding overfitting
 
 \textbf{April 17th}
 
@@ -56,7 +93,7 @@ We had considered linear models but given the large number of categorical predic
 
 For next week, we are planning to explore the predictors with near zero variance, i.e. columns that have essentially the same category for all fields in our training, and converting the sale month to season.  Neighborhood has a lot of categories and thus is being over-emphasized in tree models.  We would like the reduce the number of categories for this predictor; we are considering doing this by mean sale price.
 
-\newpage
+
 \textbf{April 3rd}
 
 This week our team focused on exploring and cleaning the Ames Housing data. We found that most of the NAs present had known values mentioned in the data description document provided by Kaggle. After replacing the NAs with known values, we still had a handful of missing values to deal with. To allow us to fit models we replaced those missing values with medians for quantitative variables or modes for categorical. More work will be needed to ensure replaced missing values are well chosen.
